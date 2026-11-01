@@ -13,3 +13,5 @@ test-results
 client/dist
 client/.vite
 tsconfig.tsbuildinfo
+__pycache__/
+*.pyc
