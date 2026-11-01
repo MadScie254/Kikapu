@@ -12,7 +12,7 @@ import { drawToCanvas, prepareUploadCopy, applyContrastBrightness } from "@/lib/
 import { recognizeReceiptText } from "@/lib/ocr";
 import { parseReceiptText } from "@shared/parsing/receiptParser";
 import type { ParsedReceiptResult } from "@shared/parsing/types";
-import { api } from "@/lib/api";
+import { api, ApiClientError } from "@/lib/api";
 
 type Mode = "choose" | "capture" | "processing" | "review" | "market";
 
@@ -55,9 +55,13 @@ export default function Scan() {
           setMode("review");
           return;
         } catch (err) {
+          console.error("AI-enhanced scan failed, falling back to on-device OCR:", err);
           toast({
             title: "AI enhancement unavailable",
-            description: "Falling back to the free on-device scanner.",
+            description:
+              err instanceof ApiClientError
+                ? `${err.message} Falling back to the free on-device scanner.`
+                : "Falling back to the free on-device scanner.",
           });
           // fall through to local OCR below
         }

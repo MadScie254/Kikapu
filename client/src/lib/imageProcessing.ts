@@ -83,11 +83,11 @@ export function canvasToBlob(canvas: HTMLCanvasElement, quality = 0.8): Promise<
 }
 
 /** Produces a smaller copy suitable for upload (kept under the ~4.5MB Vercel body limit after base64 encoding). */
-export async function prepareUploadCopy(img: HTMLImageElement, rotationDeg: number): Promise<{ base64: string; contentType: string }> {
+export async function prepareUploadCopy(img: HTMLImageElement, rotationDeg: number): Promise<{ imageBase64: string; contentType: string }> {
   const canvas = drawToCanvas(img, rotationDeg, UPLOAD_MAX_DIMENSION);
   const blob = await canvasToBlob(canvas, 0.75);
-  const base64 = await blobToBase64(blob);
-  return { base64, contentType: "image/jpeg" };
+  const imageBase64 = await blobToBase64(blob);
+  return { imageBase64, contentType: "image/jpeg" };
 }
 
 function blobToBase64(blob: Blob): Promise<string> {
