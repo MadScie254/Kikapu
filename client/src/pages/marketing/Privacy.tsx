@@ -38,8 +38,8 @@ export default function Privacy() {
             <p className="mt-2 text-muted-foreground">
               Kikapu's default scanning runs entirely in your browser using free, open OCR; no image is sent
               anywhere. Some deployments may offer an optional AI-enhanced scan using a third-party vision model
-              (currently Google Gemini). This is always off unless you explicitly opt in for that specific scan, and
-              you're told before the image leaves your device.
+              (currently Cloudflare Workers AI). This is always off unless you explicitly opt in for that specific
+              scan, and you're told before the image leaves your device.
             </p>
           </section>
           <section>

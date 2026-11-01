@@ -45,9 +45,12 @@ export default function Scan() {
         setStatusLabel("Sending to AI enhancement…");
         const upload = await prepareUploadCopy(img, rotation);
         try {
-          const { result } = await api.post<{ result: any }>("/ai/parse-receipt", { ...upload, consent: true });
-          setParsed(aiResultToParsedReceipt(result));
-          setRawOcrText(null);
+          const { result, rawText } = await api.post<{
+            result: Omit<ParsedReceiptResult, "purchasedAt"> & { purchasedAt: string | null };
+            rawText: string;
+          }>("/ai/parse-receipt", { ...upload, consent: true });
+          setParsed(reviveAiParsedReceipt(result));
+          setRawOcrText(rawText);
           setReviewSource("ocr");
           setMode("review");
           return;
@@ -166,36 +169,11 @@ function ChoiceCard({
   );
 }
 
-function aiResultToParsedReceipt(result: any): ParsedReceiptResult {
-  const toMinor = (n: number | null | undefined) => (n == null ? null : Math.round(n * 100));
-  return {
-    merchantNameRaw: result.merchantName ?? null,
-    merchantConfidence: "high",
-    purchasedAt: result.purchasedAt ? new Date(result.purchasedAt) : null,
-    dateConfidence: result.purchasedAt ? "high" : "none",
-    receiptNumber: result.receiptNumber ?? null,
-    paymentMethod: result.paymentMethod ?? null,
-    mpesaCode: null,
-    items: (result.items ?? []).map((i: any) => ({
-      rawLine: i.description,
-      description: i.description,
-      normalizedName: i.description,
-      quantity: i.quantity ?? 1,
-      unitPriceMinor: toMinor(i.unitPrice) ?? 0,
-      lineTotalMinor: toMinor(i.lineTotal) ?? 0,
-      categorySlug: "other",
-      isUncertain: false,
-    })),
-    subtotalMinor: toMinor(result.subtotal),
-    discountMinor: toMinor(result.discount) ?? 0,
-    taxMinor: toMinor(result.tax) ?? 0,
-    taxMode: "unknown",
-    printedTotalMinor: toMinor(result.total),
-    lineItemsSumMinor: (result.items ?? []).reduce((s: number, i: any) => s + (toMinor(i.lineTotal) ?? 0), 0),
-    computedTotalMinor: toMinor(result.total) ?? 0,
-    totalDiscrepancyMinor: 0,
-    totalMatches: true,
-    warnings: ["Extracted with AI enhancement; please double check the amounts below."],
-    rawText: "",
-  };
+/**
+ * The AI endpoint runs the same parseReceiptText() the free on-device
+ * scanner uses server-side, so the response is already a ParsedReceiptResult
+ * — except purchasedAt crosses JSON as an ISO string, not a Date.
+ */
+function reviveAiParsedReceipt(result: Omit<ParsedReceiptResult, "purchasedAt"> & { purchasedAt: string | null }): ParsedReceiptResult {
+  return { ...result, purchasedAt: result.purchasedAt ? new Date(result.purchasedAt) : null };
 }

@@ -53,7 +53,7 @@ tests/fixtures/   Synthetic sample receipt text used by the parser tests
 - Node.js 20+
 - A free [Neon](https://neon.tech) Postgres database
 - (Optional) A [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) store, for storing receipt photos
-- (Optional) A Google Gemini API key, only if you want to enable the optional AI-enhanced scan
+- (Optional) A [Cloudflare](https://dash.cloudflare.com) account ID and Workers AI API token, only if you want to enable the optional AI-enhanced scan
 
 ### 2. Install dependencies
 
@@ -77,7 +77,7 @@ Then fill in:
   node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
   ```
 - `BLOB_READ_WRITE_TOKEN`; optional; leave blank to run without receipt-photo storage
-- `GEMINI_API_KEY`; optional; leave blank to keep the free OCR scanner as the only option
+- `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`; optional, both required together; leave blank to keep the free OCR scanner as the only option
 
 ### 4. Set up the database
 
@@ -133,7 +133,8 @@ In **Settings → Environment Variables**, add:
 | `DATABASE_URL` | Yes | Set automatically if you used the Neon integration |
 | `AUTH_SECRET` | Yes | A long random string; generate as shown above |
 | `BLOB_READ_WRITE_TOKEN` | No | From **Storage → Create Database → Blob** |
-| `GEMINI_API_KEY` | No | Only if you want to offer the optional AI-enhanced scan |
+| `CLOUDFLARE_ACCOUNT_ID` | No | Only if you want to offer the optional AI-enhanced scan; both required together |
+| `CLOUDFLARE_API_TOKEN` | No | A token scoped to **Account - Workers AI - Edit**; both required together |
 | `NODE_ENV` | Recommended | Set to `production` |
 
 ### Step 4; Confirm the build settings
@@ -187,7 +188,7 @@ See `tests/unit/receiptParser.test.ts` and `tests/fixtures/sampleReceipts.ts` fo
 - Every API route checks that the requested resource belongs to the caller's household before returning or modifying it; there is no endpoint that trusts a client-supplied ID without that check.
 - Passwords are hashed with bcrypt; sessions are signed JWTs backed by a revocable database row (so "sign out" actually invalidates the session, not just clears a cookie).
 - Receipt images are never served from a public, guessable URL; the browser only ever requests `/api/receipts/:id/image`, which re-checks household ownership before streaming the file.
-- The optional AI enhancement is off by default, requires an explicit per-scan consent flag on every request (not just a stored preference), and is never reachable at all unless the deployer sets `GEMINI_API_KEY`.
+- The optional AI enhancement is off by default, requires an explicit per-scan consent flag on every request (not just a stored preference), and is never reachable at all unless the deployer sets both `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`. It uses Cloudflare Workers AI purely as a better OCR engine; the actual item/total/tax extraction runs through the same deterministic parser the free scanner uses, not a second, less-auditable one.
 - Auth, upload and AI endpoints are rate-limited.
 
 ---
@@ -201,7 +202,7 @@ Built honestly, not perfectly. In the interest of not overclaiming:
 - **Vercel Blob has no private-ACL tier today.** "Private" receipt images means: an unguessable storage path, and the browser is only ever given the authenticated `/api/receipts/:id/image` proxy route; never the underlying Blob URL. It is not a signed-URL system with expiry.
 - **No Playwright end-to-end suite yet.** Given the scope of this build, automated testing focused on Vitest unit tests for the highest-risk deterministic logic (money math, date/receipt parsing, budget math, duplicate detection) rather than a full browser-driven E2E suite. The core user journey (register → onboard → scan → review → save → dashboard) has been exercised manually, not under an automated E2E harness, and there is no live Postgres database in this build environment to run integration tests against.
 - **Product name matching is exact, not fuzzy-merged.** Per the spec's own instruction not to auto-merge uncertain matches, "COOKING OIL" and "CKG OIL" are currently tracked as separate products rather than offered as a suggested alias to confirm; that suggestion UI is a good next feature.
-- **The optional AI endpoint is implemented but untested against a live Gemini API key** (none was available while building this); it's been written defensively (strict response validation, clear fallback messaging), but hasn't been exercised against the real service.
+- **The optional AI endpoint is implemented but untested against a live Cloudflare Workers AI account** (none was available while building this); it's been written defensively (typed error handling, clear fallback messaging, the same deterministic parser as the free path), but hasn't been exercised against the real service yet. Expect the same framing-quality dependence as the free Tesseract path: neither OCR engine can recover a digit the photo never captured clearly, which is why every scan, AI or free, still goes through a human review step before saving.
 - **No push notifications.** Budget alerts are in-app only, as the spec asked not to promise anything unimplemented.
 
 ## Suggested next steps
