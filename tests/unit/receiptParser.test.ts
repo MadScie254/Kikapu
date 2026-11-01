@@ -11,7 +11,7 @@ import {
 
 const NOW = new Date("2026-11-20T12:00:00Z");
 
-describe("parseReceiptText — clean Kenyan supermarket receipt, VAT-inclusive pricing", () => {
+describe("parseReceiptText; clean Kenyan supermarket receipt, VAT-inclusive pricing", () => {
   const result = parseReceiptText(NAIVAS_CLEAN, NOW);
 
   it("identifies the merchant from a known retailer name", () => {
@@ -67,7 +67,7 @@ describe("parseReceiptText — clean Kenyan supermarket receipt, VAT-inclusive p
   });
 });
 
-describe("parseReceiptText — M-Pesa payment", () => {
+describe("parseReceiptText; M-Pesa payment", () => {
   const result = parseReceiptText(MPESA_PAYMENT_RECEIPT, NOW);
 
   it("extracts the M-Pesa confirmation code as the payment reference, never as an item or amount", () => {
@@ -87,7 +87,7 @@ describe("parseReceiptText — M-Pesa payment", () => {
   });
 });
 
-describe("parseReceiptText — VAT charged additively on top of the subtotal", () => {
+describe("parseReceiptText; VAT charged additively on top of the subtotal", () => {
   const result = parseReceiptText(QUICKMART_VAT_ADDITIVE, NOW);
 
   it("detects additive VAT (subtotal + VAT = total)", () => {
@@ -112,7 +112,7 @@ describe("parseReceiptText — VAT charged additively on top of the subtotal", (
   });
 });
 
-describe("parseReceiptText — faded / noisy OCR output (O/0 and similar confusions)", () => {
+describe("parseReceiptText; faded / noisy OCR output (O/0 and similar confusions)", () => {
   const result = parseReceiptText(FADED_RECEIPT_NOISY, NOW);
 
   it("still finds the merchant", () => {
@@ -135,7 +135,7 @@ describe("parseReceiptText — faded / noisy OCR output (O/0 and similar confusi
   });
 });
 
-describe("parseReceiptText — no date present anywhere on the receipt", () => {
+describe("parseReceiptText; no date present anywhere on the receipt", () => {
   const result = parseReceiptText(NO_DATE_RECEIPT, NOW);
 
   it("returns a null date rather than guessing one", () => {
@@ -153,7 +153,7 @@ describe("parseReceiptText — no date present anywhere on the receipt", () => {
   });
 });
 
-describe("parseReceiptText — printed total disagrees with the line items", () => {
+describe("parseReceiptText; printed total disagrees with the line items", () => {
   const result = parseReceiptText(MISMATCHED_TOTAL_RECEIPT, NOW);
 
   it("never silently trusts the printed total over the line items", () => {
@@ -166,7 +166,7 @@ describe("parseReceiptText — printed total disagrees with the line items", () 
   });
 });
 
-describe("parseReceiptText — receipt with no identifiable items", () => {
+describe("parseReceiptText; receipt with no identifiable items", () => {
   it("returns an empty item list with a helpful warning instead of inventing products", () => {
     const result = parseReceiptText("SOME SHOP\nTHANK YOU FOR SHOPPING", NOW);
     expect(result.items).toHaveLength(0);

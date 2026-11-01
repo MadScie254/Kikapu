@@ -12,7 +12,7 @@ import { useToast } from "@/components/ui/toast";
  * Known limitation: this prevents a draft being synced twice from the SAME
  * browser (it's deleted from IndexedDB right after a successful sync), but
  * it does not give the server an idempotency key, so the usual
- * possible-duplicate heuristic — not a hard guarantee — is what protects
+ * possible-duplicate heuristic, not a hard guarantee, is what protects
  * against a draft being saved twice if sync is interrupted mid-way.
  */
 export function OfflineSyncProvider({ children }: { children: ReactNode }) {
@@ -35,7 +35,7 @@ export function OfflineSyncProvider({ children }: { children: ReactNode }) {
             await deleteOfflineDraft(draft.id);
             synced++;
           } catch {
-            // Leave it queued — likely still offline or a transient error. Stop trying this pass.
+            // Leave it queued; likely still offline or a transient error. Stop trying this pass.
             break;
           }
         }

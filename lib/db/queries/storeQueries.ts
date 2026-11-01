@@ -23,7 +23,7 @@ export async function listStores(db: Database, householdId: string) {
 
 /**
  * Historical unit prices for a product across stores and time, plus which
- * recorded store has shown the lowest price. Explicitly "historical" — this
+ * recorded store has shown the lowest price. Explicitly "historical"; this
  * reflects what was PAID in the past, never a live/current store price.
  */
 export async function getProductPriceHistory(db: Database, householdId: string, productNameQuery: string) {

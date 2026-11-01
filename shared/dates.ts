@@ -114,7 +114,7 @@ export function monthLabel(date: Date): string {
 }
 
 /**
- * Faded thermal-receipt OCR commonly confuses O/0, I/l/1 and S/5 — but only
+ * Faded thermal-receipt OCR commonly confuses O/0, I/l/1 and S/5; but only
  * within short runs that are already mostly digits (e.g. "2O26", "O1"), so
  * real words are left untouched. Applied before date matching so a noisy
  * scan like "12-O1-2O26" still resolves to 2026-01-12.

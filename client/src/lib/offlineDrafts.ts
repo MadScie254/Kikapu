@@ -31,7 +31,7 @@ function getDb() {
  * Saves a receipt that couldn't be submitted (no connection) so it can be
  * synced later. Each draft gets a stable client-generated id, which the
  * sync routine uses to avoid re-saving the same draft twice if the user has
- * multiple tabs open — it does NOT protect against the server independently
+ * multiple tabs open; it does NOT protect against the server independently
  * seeing two different drafts as duplicates (that's covered by the normal
  * possible-duplicate check once the sync actually submits).
  */

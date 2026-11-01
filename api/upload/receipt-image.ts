@@ -23,7 +23,7 @@ export default withApi(async (req: VercelRequest, res: VercelResponse) => {
     sendJson(res, 200, {
       stored: false,
       message:
-        "Image storage isn't configured on this deployment. Your receipt details will still be saved — just not the photo itself.",
+        "Image storage isn't configured on this deployment. Your receipt details will still be saved, just not the photo itself.",
     });
     return;
   }

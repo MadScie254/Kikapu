@@ -41,7 +41,7 @@ export default function Stores() {
                 <div className="space-y-2">
                   {priceHistory.cheapestStore && (
                     <Badge variant="success" className="mb-2">
-                      Historically cheapest at {priceHistory.cheapestStore.merchantName} — {formatMoney(priceHistory.cheapestStore.unitPriceMinor)}
+                      Historically cheapest at {priceHistory.cheapestStore.merchantName}: {formatMoney(priceHistory.cheapestStore.unitPriceMinor)}
                     </Badge>
                   )}
                   {priceHistory.history.slice(0, 8).map((h, i) => (
@@ -54,7 +54,7 @@ export default function Stores() {
                     </div>
                   ))}
                   <p className="pt-1 text-xs text-muted-foreground">
-                    These are prices you've previously paid — not live prices at any store today.
+                    These are prices you've previously paid; not live prices at any store today.
                   </p>
                 </div>
               ) : (

@@ -52,7 +52,7 @@ export function drawToCanvas(img: HTMLImageElement, rotationDeg: number, maxDime
   return canvas;
 }
 
-/** Simple linear contrast/brightness boost — helps OCR on faded thermal receipts. */
+/** Simple linear contrast/brightness boost; helps OCR on faded thermal receipts. */
 export function applyContrastBrightness(canvas: HTMLCanvasElement, contrast: number, brightness: number): HTMLCanvasElement {
   const ctx = canvas.getContext("2d")!;
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);

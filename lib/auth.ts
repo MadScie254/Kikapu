@@ -75,7 +75,7 @@ export interface AuthContext {
 /**
  * Resolves the authenticated user + their (first/owning) household from the
  * request cookie. Returns null if unauthenticated or the session was
- * revoked/expired — callers must treat null as 401, never assume a user.
+ * revoked/expired; callers must treat null as 401, never assume a user.
  */
 export async function getAuthContext(req: VercelRequest): Promise<AuthContext | null> {
   const token = parseCookie(req.headers.cookie, SESSION_COOKIE);

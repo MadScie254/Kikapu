@@ -55,7 +55,7 @@ describe("formatMoney", () => {
 
 describe("money arithmetic avoids float drift", () => {
   it("adds many small amounts exactly", () => {
-    // Classic float trap: 0.1 + 0.2 !== 0.3 in IEEE754 — minor units sidestep this.
+    // Classic float trap: 0.1 + 0.2 !== 0.3 in IEEE754; minor units sidestep this.
     const total = addMoney(toMinorUnits("0.10"), toMinorUnits("0.20"));
     expect(total).toBe(30);
     expect(minorToDecimalString(total)).toBe("0.30");
@@ -118,7 +118,7 @@ describe("reconcileReceiptTotal", () => {
   });
 
   it("never mistakes cash tendered / change for part of the total (caller must exclude them before calling)", () => {
-    // This test documents the contract: reconcileReceiptTotal trusts its inputs completely —
+    // This test documents the contract: reconcileReceiptTotal trusts its inputs completely -
     // it's the parser's job (tested separately) to never feed cash/change into lineItemsSum.
     const result = reconcileReceiptTotal({
       lineItemsSum: 143500,

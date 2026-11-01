@@ -108,7 +108,7 @@ export function HeroDemo() {
                 </div>
                 <div className="rounded-lg bg-muted p-3 text-xs text-muted-foreground">
                   You've spent <strong className="text-foreground">{formatMoney(DEMO_TOTAL_MINOR)}</strong> today across{" "}
-                  <strong className="text-foreground">5 items</strong> — groceries made up most of it.
+                  <strong className="text-foreground">5 items</strong>; groceries made up most of it.
                 </div>
               </motion.div>
             )}

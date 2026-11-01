@@ -21,7 +21,7 @@ CASH                 1,500.00
 CHANGE                  65.00
 THANK YOU, SHOP AGAIN`;
 
-/** Same basket, paid via M-Pesa — the confirmation code must never be read as an item or amount. */
+/** Same basket, paid via M-Pesa; the confirmation code must never be read as an item or amount. */
 export const MPESA_PAYMENT_RECEIPT = `NAIVAS SUPERMARKET
 KILIMANI BRANCH
 12/11/2026  18:42

@@ -37,7 +37,7 @@ export default function Scan() {
         if (res.stored && res.imageBlobPath) setUploadedImagePath(res.imageBlobPath);
       })
       .catch(() => {
-        /* Non-fatal — the receipt's structured data is what matters most. */
+        /* Non-fatal; the receipt's structured data is what matters most. */
       });
 
     try {
@@ -92,7 +92,7 @@ export default function Scan() {
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="font-display text-2xl font-bold">Scan a Receipt</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Snap a photo and Kikapu will read the details — you confirm before anything is saved.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Snap a photo and Kikapu will read the details; you confirm before anything is saved.</p>
 
       <div className="mt-6">
         {mode === "choose" && (
@@ -195,7 +195,7 @@ function aiResultToParsedReceipt(result: any): ParsedReceiptResult {
     computedTotalMinor: toMinor(result.total) ?? 0,
     totalDiscrepancyMinor: 0,
     totalMatches: true,
-    warnings: ["Extracted with AI enhancement — please double check the amounts below."],
+    warnings: ["Extracted with AI enhancement; please double check the amounts below."],
     rawText: "",
   };
 }

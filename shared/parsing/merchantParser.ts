@@ -52,7 +52,7 @@ export function parseMerchantName(lines: string[]): { name: string | null; confi
 
 export function extractReceiptNumber(lines: string[]): string | null {
   for (const line of lines) {
-    // Skip payment-method lines entirely — "M-PESA REF: XXXX" would otherwise
+    // Skip payment-method lines entirely; "M-PESA REF: XXXX" would otherwise
     // match the "ref" keyword below and get mistaken for the receipt number.
     if (/m[\-\s]?pesa|\bvisa\b|\bmastercard\b/i.test(line)) continue;
     const m = line.match(/\b(?:receipt|rcpt|inv(?:oice)?|ref|txn|trans(?:action)?)\s*[.#:no]*\s*[:#]?\s*([A-Z0-9\-\/]{4,20})\b/i);
@@ -63,9 +63,9 @@ export function extractReceiptNumber(lines: string[]): string | null {
 
 /**
  * M-Pesa confirmation codes look like 10 uppercase alphanumeric chars, e.g.
- * QGH7X9K2L1 — never a product price. Checked in priority order (M-Pesa,
+ * QGH7X9K2L1; never a product price. Checked in priority order (M-Pesa,
  * then card, then cash) across ALL lines rather than stopping at whichever
- * keyword happens to appear first — a receipt can print "CASH TENDERED" /
+ * keyword happens to appear first; a receipt can print "CASH TENDERED" /
  * "CHANGE" informationally even when the actual tender was M-Pesa, so a
  * single combined pass could miss the real payment method.
  */

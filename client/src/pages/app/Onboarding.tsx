@@ -91,7 +91,7 @@ export default function Onboarding() {
             {step === 2 && (
               <div className="space-y-4">
                 <h2 className="font-display text-xl font-bold">What do you usually shop for?</h2>
-                <p className="text-sm text-muted-foreground">Pick a few — you can add or change categories later.</p>
+                <p className="text-sm text-muted-foreground">Pick a few; you can add or change categories later.</p>
                 <div className="flex flex-wrap gap-2">
                   {SELECTABLE_CATEGORIES.map((cat) => {
                     const active = selected.includes(cat.slug);

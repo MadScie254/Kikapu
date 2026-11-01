@@ -37,7 +37,7 @@ export default function Analytics() {
           className="mt-8"
           icon={<Sparkles className="size-6" />}
           title="Nothing to analyze yet"
-          description="Scan a few receipts and come back — your spending patterns will show up here automatically."
+          description="Scan a few receipts and come back; your spending patterns will show up here automatically."
         />
       </div>
     );

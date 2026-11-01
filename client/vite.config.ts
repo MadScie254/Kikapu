@@ -13,7 +13,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["icons/*.png"],
       manifest: {
-        name: "Kikapu — Smart Receipt Scanner",
+        name: "Kikapu: Smart Receipt Scanner",
         short_name: "Kikapu",
         description: "Know where every shilling goes.",
         theme_color: "#14213D",
@@ -27,7 +27,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Never cache API responses in the PWA shell cache — receipts and
+        // Never cache API responses in the PWA shell cache; receipts and
         // budgets must always come from the network when online. Only the
         // static app shell (HTML/JS/CSS/fonts) is cached for offline use.
         navigateFallbackDenylist: [/^\/api\//],

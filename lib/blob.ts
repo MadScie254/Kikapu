@@ -9,7 +9,7 @@ const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 /**
  * Receipt images are never stored under a guessable path (no user id, no
  * sequential id) and the resulting Blob URL is never sent to the browser
- * directly — only the path is kept in the DB, and the browser only ever
+ * directly; only the path is kept in the DB, and the browser only ever
  * fetches it through GET /api/receipts/:id/image, which checks household
  * ownership first. See lib/http.ts assertOwnership.
  */
@@ -30,7 +30,7 @@ export async function uploadReceiptImage(
   const ext = contentType === "image/png" ? "png" : contentType === "image/webp" ? "webp" : "jpg";
   const pathname = `receipts/${householdId}/${randomUUID()}.${ext}`;
   const blob = await put(pathname, buffer, {
-    access: "public", // Vercel Blob has no private-ACL tier today; see note above — real access control
+    access: "public", // Vercel Blob has no private-ACL tier today; see note above; real access control
     contentType, // is enforced at the API layer (ownership-checked proxy route), not by the storage URL.
     addRandomSuffix: false,
   });
@@ -42,7 +42,7 @@ export async function deleteReceiptImage(pathname: string): Promise<void> {
   try {
     await del(pathname);
   } catch {
-    // Already deleted or never existed — not fatal.
+    // Already deleted or never existed; not fatal.
   }
 }
 
@@ -58,7 +58,7 @@ export async function blobExists(pathname: string): Promise<boolean> {
 
 /**
  * Resolves a stored blob pathname to its fetchable URL, server-side only.
- * The browser never calls this directly — the client only ever holds the
+ * The browser never calls this directly; the client only ever holds the
  * opaque `pathname` it got back from the upload endpoint, never the URL.
  */
 export async function resolveBlobUrl(pathname: string): Promise<string | null> {

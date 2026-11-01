@@ -1,7 +1,7 @@
 /**
  * OCR output from thermal till receipts is noisy: broken spacing, confused
  * glyphs (O/0, I/1/l, S/5, B/8), and stray punctuation. These helpers clean
- * text up WITHOUT guessing content — they only fix character-level noise.
+ * text up WITHOUT guessing content; they only fix character-level noise.
  */
 
 /** Collapse repeated whitespace, strip control characters, trim each line. */
@@ -30,7 +30,7 @@ export function splitLines(raw: string): string[] {
  * Deliberately has NO "mostly real word" bail-out: its only caller,
  * extractNumberTokens, already restricts matches to the digit/confusable-
  * letter character class below via its own regex, so by construction a
- * token reaching this function can never be ordinary text — a heuristic
+ * token reaching this function can never be ordinary text; a heuristic
  * like "skip it if there are more letters than digits" would otherwise
  * misfire on exactly the receipts most worth fixing, where a faded "00"
  * fraction OCRs as "OO" and outnumbers a short integer part (e.g. "85.OO"

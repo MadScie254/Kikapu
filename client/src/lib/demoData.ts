@@ -1,6 +1,6 @@
 /**
  * Static, isolated demo fixture used ONLY by the public marketing site
- * (Home hero animation and /demo). Never touches the API or database —
+ * (Home hero animation and /demo). Never touches the API or database -
  * clearly a sample, never confused with a real signed-in user's data.
  */
 export const DEMO_RECEIPT_LINES = [

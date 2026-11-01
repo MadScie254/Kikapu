@@ -15,7 +15,7 @@ const STEPS = [
     icon: Sparkles,
     title: "2. Let Kikapu extract the details",
     description:
-      "A free OCR engine (Tesseract.js) reads the text entirely in your browser — nothing is sent to a paid service. Kikapu then uses deterministic rules (not AI guesswork) to identify the merchant, date, items, quantities, prices, discounts and total.",
+      "A free OCR engine (Tesseract.js) reads the text entirely in your browser; nothing is sent to a paid service. Kikapu then uses deterministic rules (not AI guesswork) to identify the merchant, date, items, quantities, prices, discounts and total.",
   },
   {
     icon: Pencil,
@@ -27,13 +27,13 @@ const STEPS = [
     icon: LineChart,
     title: "4. Discover where your money goes",
     description:
-      "Once saved, your dashboard updates instantly — spending trends, category breakdowns, top products and store comparisons, all built from your real transactions.",
+      "Once saved, your dashboard updates instantly; spending trends, category breakdowns, top products and store comparisons, all built from your real transactions.",
   },
 ];
 
 const PRINCIPLES = [
   "Your confirmation is always the final authority before anything is saved.",
-  "If OCR can't read a receipt, you can switch to manual entry immediately — no dead ends.",
+  "If OCR can't read a receipt, you can switch to manual entry immediately; no dead ends.",
   "M-Pesa codes, cash tendered and change are never mistaken for a product.",
   "No shopping trip, including open-air markets without receipts, is left out.",
 ];

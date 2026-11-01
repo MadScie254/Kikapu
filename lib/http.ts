@@ -33,7 +33,7 @@ type Handler = (req: VercelRequest, res: VercelResponse) => Promise<void> | void
  * Wraps a Vercel function handler with: CORS for local dev, OPTIONS
  * preflight, centralized error handling (never leaks stack traces or
  * internals to the client), and privacy-conscious server-side logging
- * (error message + route only — never request bodies, passwords, or
+ * (error message + route only; never request bodies, passwords, or
  * cookies).
  */
 export function withApi(handler: Handler): Handler {
@@ -98,7 +98,7 @@ export function parseQuery<T>(schema: ZodType<T, any, any>, req: VercelRequest):
   return result.data;
 }
 
-/** Ensures a resource row's household matches the authenticated user's household — the core ownership guard. */
+/** Ensures a resource row's household matches the authenticated user's household; the core ownership guard. */
 export function assertOwnership(resourceHouseholdId: string, ctx: AuthContext) {
   if (resourceHouseholdId !== ctx.householdId) {
     throw new HttpError(404, "Not found.");

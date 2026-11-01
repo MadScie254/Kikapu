@@ -21,7 +21,7 @@ export interface DuplicateCheckInput {
  * household shares the same merchant (fuzzy-matched), the same calendar day,
  * a total within 1 KES, and the same number of line items.
  *
- * This is a metadata-based heuristic, not an image perceptual hash — two
+ * This is a metadata-based heuristic, not an image perceptual hash; two
  * genuinely separate receipts from the same store on the same day for the
  * same amount (e.g. buying the same top-up twice) can still trigger it.
  * That's why it only ever warns; the user decides.

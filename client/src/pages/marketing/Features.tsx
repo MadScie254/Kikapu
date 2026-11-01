@@ -11,7 +11,7 @@ const SECTIONS = [
     icon: ScanLine,
     title: "Smart Receipt Scanning",
     description:
-      "Photograph a receipt with your phone or drag one onto the page on desktop. A free, on-device OCR engine reads the merchant, date, items, quantities, prices and totals — no paid AI service required.",
+      "Photograph a receipt with your phone or drag one onto the page on desktop. A free, on-device OCR engine reads the merchant, date, items, quantities, prices and totals; no paid AI service required.",
   },
   {
     icon: Wallet,
@@ -23,13 +23,13 @@ const SECTIONS = [
     icon: BarChart3,
     title: "Monthly Spending Dashboards",
     description:
-      "See daily, weekly, monthly and yearly trends, broken down by category, store and product — with real numbers from your own saved receipts.",
+      "See daily, weekly, monthly and yearly trends, broken down by category, store and product; with real numbers from your own saved receipts.",
   },
   {
     icon: Wallet,
     title: "Budget Tracking",
     description:
-      "Set an overall household budget or per-category limits. Kikapu shows progress with friendly, non-judgmental messaging — never shaming, just informing.",
+      "Set an overall household budget or per-category limits. Kikapu shows progress with friendly, non-judgmental messaging; never shaming, just informing.",
   },
   {
     icon: Receipt,
@@ -41,13 +41,13 @@ const SECTIONS = [
     icon: Store,
     title: "Price Comparisons",
     description:
-      "Kikapu remembers what you paid for things at different stores, so you can see where a product has historically been cheapest — clearly labelled as historical, not live pricing.",
+      "Kikapu remembers what you paid for things at different stores, so you can see where a product has historically been cheapest; clearly labelled as historical, not live pricing.",
   },
   {
     icon: ListChecks,
     title: "Shopping Lists",
     description:
-      "Plan your next trip with quantity and estimated cost — estimates are pulled from your own purchase history where available.",
+      "Plan your next trip with quantity and estimated cost; estimates are pulled from your own purchase history where available.",
   },
   {
     icon: ShieldCheck,
@@ -65,7 +65,7 @@ const SECTIONS = [
     icon: Wifi,
     title: "Works Offline",
     description:
-      "Capture a receipt or log a manual purchase with no signal — Kikapu saves a draft on your device and syncs it once you're back online.",
+      "Capture a receipt or log a manual purchase with no signal; Kikapu saves a draft on your device and syncs it once you're back online.",
   },
   {
     icon: Sparkles,

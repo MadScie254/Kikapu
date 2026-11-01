@@ -17,7 +17,7 @@ import { registerSchema, loginSchema } from "../../shared/validation/schemas.js"
 import { getPublicUserPayload } from "../../lib/db/queries/userQueries.js";
 
 /**
- * Consolidated auth routes — /api/auth/register, /login, /logout, /me —
+ * Consolidated auth routes; /api/auth/register, /login, /logout, /me -
  * combined into one Vercel function (instead of four) to stay under the
  * Hobby plan's 12-serverless-function-per-deployment limit. The public
  * URL paths are unchanged.

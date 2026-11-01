@@ -1,6 +1,6 @@
 /**
  * Seeds a demo account with realistic fixture data for LOCAL DEVELOPMENT ONLY.
- * Never run against a production database you care about — it inserts a
+ * Never run against a production database you care about; it inserts a
  * fresh demo user every run. Usage: npm run db:seed
  */
 import "dotenv/config";

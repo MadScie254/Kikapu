@@ -1,7 +1,7 @@
 /**
  * Thin wrapper around Tesseract.js. The library is dynamically imported so
  * its ~2MB core + language data are only ever downloaded when a user
- * actually opens the Scan page — never on the homepage or other app pages.
+ * actually opens the Scan page; never on the homepage or other app pages.
  * Tesseract.js runs its recognition in its own Web Worker internally, so
  * this never blocks the main thread / UI.
  */

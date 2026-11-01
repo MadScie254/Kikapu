@@ -7,7 +7,7 @@ import { enforceRateLimit } from "../../lib/rateLimit.js";
  * OPTIONAL AI enhancement. Off by default and only reachable when:
  *  1. the deployer has set GEMINI_API_KEY, AND
  *  2. the caller explicitly sends consent:true on THIS request (not just a
- *     stored preference) — re-asserted every scan so the disclosure stays
+ *     stored preference); re-asserted every scan so the disclosure stays
  *     meaningful.
  * If either is missing, or the Gemini call fails/hits quota, callers must
  * fall back to the free Tesseract.js + deterministic parser pipeline; this

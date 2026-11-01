@@ -16,12 +16,12 @@ export function isSummaryLine(line: string): boolean {
   return SUMMARY_LINE_RE.test(line.trim());
 }
 
-/** Lines that are pure metadata (address, phone, barcodes) — skip entirely, not an item and not a summary field. */
+/** Lines that are pure metadata (address, phone, barcodes); skip entirely, not an item and not a summary field. */
 const METADATA_LINE_RE =
   /^(tel|phone|p\.?o\.?\s?box|pin\s?(?:no)?\s*[:#]|vat\s?reg|address|location|email|www\.|http|receipt\s?no|invoice\s?no|date\s*[:\/]|time\s*:)/i;
 
 // A line that is ENTIRELY a date (optionally with a time), with nothing else
-// on it — e.g. "12/11/2026", "12-O1-2O26 18:42" (after OCR noise-fixing).
+// on it; e.g. "12/11/2026", "12-O1-2O26 18:42" (after OCR noise-fixing).
 // Receipts often print the transaction date/time on its own line with no
 // "Date:" label, so this can't rely on a keyword prefix like the metadata
 // regex above; it has to recognize the whole-line shape instead.
@@ -51,7 +51,7 @@ export function parseLineItem(rawLine: string): ParsedLineItem | null {
   if (allNumbers.length === 0) return null;
 
   // Drop pack-size numbers glued to a unit abbreviation ("2L", "500ML",
-  // "2KG", "400G") — these describe the product, not its price, and would
+  // "2KG", "400G"); these describe the product, not its price, and would
   // otherwise get mistaken for a quantity or unit price below.
   const PACK_SIZE_SUFFIX_RE = /^(kg|g|ml|l|ltr|ltrs|pcs|pc|pkt|pack)\b/i;
   const numbers = allNumbers.filter((tok) => {
@@ -79,7 +79,7 @@ export function parseLineItem(rawLine: string): ParsedLineItem | null {
       const expected = qty * unitPriceValue;
       if (Math.abs(expected - lineTotalValue) > Math.max(0.5, expected * 0.02)) {
         isUncertain = true;
-        uncertainReason = "Quantity × unit price doesn't match the line total — please verify.";
+        uncertainReason = "Quantity x unit price doesn't match the line total, please verify.";
       }
     } else {
       // Three numbers but not a clean qty-marker pattern: fall back to treating
@@ -89,7 +89,7 @@ export function parseLineItem(rawLine: string): ParsedLineItem | null {
       lineTotalValue = totalTok.value;
       descEndIndex = priceTok.index;
       isUncertain = true;
-      uncertainReason = "Multiple numbers found on this line — quantity may be wrong.";
+      uncertainReason = "Multiple numbers found on this line, quantity may be wrong.";
     }
   } else if (numbers.length === 2) {
     const [a, b] = numbers;
@@ -106,7 +106,7 @@ export function parseLineItem(rawLine: string): ParsedLineItem | null {
       } else {
         qty = 1;
         isUncertain = true;
-        uncertainReason = "Couldn't confirm quantity from this line — defaulted to 1.";
+        uncertainReason = "Couldn't confirm quantity from this line, defaulted to 1.";
       }
     }
   } else {
@@ -129,7 +129,7 @@ export function parseLineItem(rawLine: string): ParsedLineItem | null {
   let lineTotalMinor = toMinorUnits(lineTotalValue.toFixed(2));
   // If unit price * qty was used to derive values, keep lineTotal as printed (source of truth from the receipt).
 
-  // A real product line never costs nothing — this rejects stray digit runs
+  // A real product line never costs nothing; this rejects stray digit runs
   // picked up from PINs, barcodes or reference numbers that slipped past the
   // metadata/summary filters above.
   if (unitPriceMinor === 0 && lineTotalMinor === 0) return null;
@@ -174,7 +174,7 @@ export function extractSummaryFields(lines: string[]): SummaryFields {
     } else if (/\b(v\.?a\.?t\.?|tax)\b/i.test(trimmed) && !/\btotal\b/i.test(trimmed)) {
       taxMinor += Math.abs(minor);
     } else if (/\bgrand\s?total\b|\btotal\b(?!.*(sub|item|qty))/i.test(trimmed) && !/\bsub\b/i.test(trimmed)) {
-      // Prefer the last "total"-labelled line encountered — the final printed total
+      // Prefer the last "total"-labelled line encountered; the final printed total
       // on a receipt is usually the last of several "total"-ish lines.
       printedTotalMinor = minor;
     } else if (/\bamount\s?due\b/i.test(trimmed)) {

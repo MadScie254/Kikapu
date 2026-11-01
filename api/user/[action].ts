@@ -9,8 +9,8 @@ import { getPublicUserPayload } from "../../lib/db/queries/userQueries.js";
 import { minorToDecimalString } from "../../shared/money.js";
 
 /**
- * Consolidated /api/user/* routes — preferences, onboarding, account,
- * export — combined into one function to stay under Vercel Hobby's
+ * Consolidated /api/user/* routes; preferences, onboarding, account,
+ * export; combined into one function to stay under Vercel Hobby's
  * 12-function-per-deployment limit. Public URL paths are unchanged.
  */
 export default withApi(async (req: VercelRequest, res: VercelResponse) => {

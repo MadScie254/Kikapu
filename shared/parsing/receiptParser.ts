@@ -6,7 +6,7 @@ import { addMoney, subtractMoney } from "../money.js";
 import type { ParsedReceiptResult } from "./types.js";
 
 /**
- * Deterministic receipt parser. No AI, no network calls — pure text
+ * Deterministic receipt parser. No AI, no network calls; pure text
  * analysis of raw OCR output. Designed to be run entirely in the browser
  * immediately after Tesseract.js produces text, so the user sees a filled
  * verification form instantly.
@@ -42,7 +42,7 @@ export function parseReceiptText(rawText: string, now: Date = new Date()): Parse
       purchasedAt = wholeTextDate;
       dateConfidence = "low";
     } else {
-      warnings.push("Couldn't find a date on this receipt — please enter it manually.");
+      warnings.push("Couldn't find a date on this receipt, please enter it manually.");
     }
   }
 
@@ -54,7 +54,7 @@ export function parseReceiptText(rawText: string, now: Date = new Date()): Parse
   }
 
   if (items.length === 0) {
-    warnings.push("Couldn't identify any product lines automatically — you can add items manually below.");
+    warnings.push("Couldn't identify any product lines automatically, you can add items manually below.");
   }
 
   const { subtotalMinor, discountMinor, taxMinor, printedTotalMinor } = extractSummaryFields(lines);

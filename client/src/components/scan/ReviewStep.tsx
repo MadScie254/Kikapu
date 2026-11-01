@@ -178,7 +178,7 @@ export function ReviewStep({ parsed, source, rawOcrText, uploadedImagePath, onDo
         await saveOfflineDraft(payload as any);
         toast({
           title: "Saved offline",
-          description: "No connection right now — this will sync automatically once you're back online.",
+          description: "No connection right now; this will sync automatically once you're back online.",
         });
         onDone();
         navigate("/app/receipts");

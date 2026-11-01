@@ -91,7 +91,7 @@ export async function checkForDuplicate(db: Database, householdId: string, input
 export async function createReceipt(db: Database, householdId: string, userId: string, input: ReceiptInput) {
   const merchant = await findOrCreateMerchant(db, householdId, input.merchantNameRaw);
 
-  // Resolve/auto-create products for each item BEFORE the transaction — these
+  // Resolve/auto-create products for each item BEFORE the transaction; these
   // are idempotent lookups-or-creates and keep the transaction itself small
   // and free of interdependent round trips (a neon-http constraint).
   const itemsWithProducts = await Promise.all(

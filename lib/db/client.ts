@@ -5,7 +5,7 @@ import * as schema from "./schema.js";
 let cachedDb: ReturnType<typeof drizzle<typeof schema>> | null = null;
 
 /**
- * Lazily-created Drizzle client over Neon's HTTP driver — well-suited to
+ * Lazily-created Drizzle client over Neon's HTTP driver; well-suited to
  * Vercel's serverless functions because it opens no long-lived TCP
  * connection per invocation. Throws a clear error (instead of crashing with
  * an unhelpful Postgres message) when DATABASE_URL is missing.

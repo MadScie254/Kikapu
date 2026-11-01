@@ -89,7 +89,7 @@ export default function ShoppingListDetail() {
               </div>
             ))}
 
-          {list.items.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No items yet — add your first below.</p>}
+          {list.items.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No items yet; add your first below.</p>}
 
           <div className="flex gap-2 pt-2">
             <Input placeholder="Add an item…" value={newName} onChange={(e) => setNewName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleAdd()} />

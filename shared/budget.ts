@@ -20,7 +20,7 @@ export function computeBudgetProgress(spentMinor: number, budgetMinor: number | 
       usedRatio: 0,
       remainingMinor: 0,
       status: "no-budget",
-      percentLabel: "—",
+      percentLabel: "N/A",
     };
   }
   const usedRatio = ratio(spentMinor, budgetMinor);
@@ -44,12 +44,12 @@ export function budgetMessage(categoryName: string, progress: BudgetProgress): s
   if (progress.status === "no-budget") return `No budget set for ${categoryName} yet.`;
   const pct = Math.round(progress.usedRatio * 100);
   if (progress.status === "over-budget") {
-    return `You've used ${pct}% of your ${categoryName} budget this month — ${Math.abs(
+    return `You've used ${pct}% of your ${categoryName} budget this month, ${Math.abs(
       progress.remainingMinor / 100
     ).toFixed(0)} KSh over.`;
   }
   if (progress.status === "nearing-limit") {
     return `You've used ${pct}% of your ${categoryName} budget this month.`;
   }
-  return `You've used ${pct}% of your ${categoryName} budget this month — on track.`;
+  return `You've used ${pct}% of your ${categoryName} budget this month, on track.`;
 }

@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 const FEATURES = [
-  { icon: ScanLine, title: "Smart Receipt Scanning", description: "Snap a photo and Kikapu reads the merchant, items, and totals — right in your browser, no cloud AI required." },
+  { icon: ScanLine, title: "Smart Receipt Scanning", description: "Snap a photo and Kikapu reads the merchant, items, and totals; right in your browser, no cloud AI required." },
   { icon: Wallet, title: "Automatic Calculations", description: "Quantities, discounts, and VAT reconciled against the printed total, with any mismatch flagged for you." },
   { icon: BarChart3, title: "Spending Dashboards", description: "Daily, weekly, and monthly trends broken down by category, store, and product." },
   { icon: Wallet, title: "Budget Tracking", description: "Set an overall or per-category budget and see exactly how much is left, without judgment." },
@@ -33,7 +33,7 @@ const FEATURES = [
 const STEPS = [
   { icon: Camera, title: "Scan your receipt", description: "Snap a photo with your phone or upload one from your gallery." },
   { icon: Sparkles, title: "Let Kikapu extract the details", description: "Free on-device OCR reads the store, items, prices and totals." },
-  { icon: Pencil, title: "Review and save your shopping", description: "Fix anything that looks off — you always have the final word." },
+  { icon: Pencil, title: "Review and save your shopping", description: "Fix anything that looks off; you always have the final word." },
   { icon: LineChart, title: "Discover where your money goes", description: "Instant dashboards show patterns across days, categories, and stores." },
 ];
 
@@ -78,7 +78,7 @@ export default function Home() {
         <div className="mx-auto max-w-4xl px-4 py-14 text-center sm:px-6">
           <h2 className="font-display text-2xl font-bold sm:text-3xl">Shopping receipts pile up. Clarity doesn't.</h2>
           <p className="mt-4 text-muted-foreground">
-            You know roughly what you spent this month — but not exactly where it went, which store was cheaper, or
+            You know roughly what you spent this month; but not exactly where it went, which store was cheaper, or
             whether that cooking oil really did get more expensive. Kikapu turns the paper in your bag into answers.
           </p>
         </div>
@@ -139,7 +139,7 @@ export default function Home() {
 
       {/* Demo CTA */}
       <section className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6">
-        <h2 className="font-display text-3xl font-bold">See it in action — no account needed</h2>
+        <h2 className="font-display text-3xl font-bold">See it in action; no account needed</h2>
         <p className="mt-3 text-muted-foreground">Explore a sample receipt and dashboard before you sign up.</p>
         <Button size="lg" variant="accent" className="mt-6" asChild>
           <Link to="/demo">Try a Demo Receipt</Link>
@@ -181,7 +181,7 @@ export default function Home() {
 const FAQ = [
   { q: "Do I need to pay for an AI subscription?", a: "No. Kikapu's core scanning uses a free, on-device OCR engine. An optional AI enhancement can be enabled later by whoever deploys the app, and you choose per-scan whether to use it." },
   { q: "Is my shopping data private?", a: "Yes. Your receipts and transactions are only visible to you (and household members you add later). We don't sell data or run ads." },
-  { q: "What if the scan gets something wrong?", a: "You review and correct every field before anything is saved — scanning never saves data without your confirmation." },
-  { q: "Does it work without receipts, like at a market?", a: "Yes. Local Market Mode lets you log a quick manual purchase — tomatoes, onions, sukuma wiki — in seconds." },
+  { q: "What if the scan gets something wrong?", a: "You review and correct every field before anything is saved; scanning never saves data without your confirmation." },
+  { q: "Does it work without receipts, like at a market?", a: "Yes. Local Market Mode lets you log a quick manual purchase, like tomatoes, onions and sukuma wiki, in seconds." },
   { q: "What currency does it use?", a: "Kenyan Shillings (KES) by default, shown as KSh throughout." },
 ];
