@@ -5,6 +5,16 @@
   "installCommand": "npm install",
   "framework": null,
   "rewrites": [
+    { "source": "/api/admin", "destination": "/api/_handlers/admin" },
+    { "source": "/api/admin/:segments*", "destination": "/api/_handlers/admin?segments=:segments*" },
+    { "source": "/api/budgets", "destination": "/api/_handlers/budgets" },
+    { "source": "/api/budgets/:segments*", "destination": "/api/_handlers/budgets?segments=:segments*" },
+    { "source": "/api/receipts", "destination": "/api/_handlers/receipts" },
+    { "source": "/api/receipts/:segments*", "destination": "/api/_handlers/receipts?segments=:segments*" },
+    { "source": "/api/shopping-lists", "destination": "/api/_handlers/shopping-lists" },
+    { "source": "/api/shopping-lists/:segments*", "destination": "/api/_handlers/shopping-lists?segments=:segments*" },
+    { "source": "/api/stores", "destination": "/api/_handlers/stores" },
+    { "source": "/api/stores/:segments*", "destination": "/api/_handlers/stores?segments=:segments*" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [

@@ -17,20 +17,26 @@ export function sendJson(res: VercelResponse, status: number, body: unknown) {
 }
 
 /**
- * Reads the path segments captured by an optional catch-all route file,
- * e.g. api/receipts/[[...segments]].ts for /api/receipts/:a/:b.
+ * Reads the path segments for a consolidated route, e.g.
+ * /api/receipts/:id/image -> ["<id>", "image"].
  *
- * Vercel's plain Node builder (this project has no framework) does not
- * reliably use the plain "segments" key: an earlier version of these routes
- * found it under the literal "...segments" key instead (keeping the dots
- * from the bracket syntax). Rather than hardcode one exact key name and
- * risk silently reading `undefined` again the next time this changes, scan
- * for whichever query key actually contains "segments".
+ * These routes are NOT Vercel filesystem dynamic segments (api/x/[...].ts):
+ * that convention turned out unreliable on this project's plain Node
+ * builder in two different ways (a literal "...segments" query key instead
+ * of "segments", and a REQUIRED catch-all that never matches the bare
+ * parent path regardless of single vs double brackets — confirmed directly
+ * against the live deployment, not assumed). Routing is instead handled
+ * explicitly via vercel.json rewrites, which pass the matched sub-path as
+ * ONE slash-joined query string value (e.g. "?segments=<id>/image"), not an
+ * array. Still scans for whichever key contains "segments" rather than
+ * hardcoding one name, since that specific assumption has already broken
+ * once before.
  */
 export function getCatchAllSegments(req: VercelRequest): string[] {
   for (const [key, value] of Object.entries(req.query)) {
     if (key.toLowerCase().includes("segments")) {
-      return ([] as string[]).concat((value as string | string[] | undefined) ?? []);
+      const raw = ([] as string[]).concat((value as string | string[] | undefined) ?? []);
+      return raw.flatMap((s) => s.split("/")).filter(Boolean);
     }
   }
   return [];
