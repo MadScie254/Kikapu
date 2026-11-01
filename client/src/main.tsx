@@ -6,7 +6,10 @@ import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./components/ui/toast";
+import { registerServiceWorker } from "./lib/registerServiceWorker";
 import "./index.css";
+
+registerServiceWorker();
 
 const queryClient = new QueryClient({
   defaultOptions: {
