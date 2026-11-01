@@ -21,6 +21,11 @@ export default withApi(async (req: VercelRequest, res: VercelResponse) => {
   const db = getDb();
   const segments = ([] as string[]).concat((req.query.segments as string | string[] | undefined) ?? []);
 
+  if (req.headers["x-debug-dump"]) {
+    sendJson(res, 200, { url: req.url, method: req.method, query: req.query, segments });
+    return;
+  }
+
   // One-time setup actions: secret-gated, not role-gated.
   if (segments.length === 1 && segments[0] === "migrate") {
     requireMethod(req, "POST");
