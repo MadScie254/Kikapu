@@ -215,7 +215,17 @@ export function parseTwoLineItemDetail(rawLine: string): TwoLineItemDetail | nul
 
   const [priceTok, totalTok] = tokens.slice(-2);
   const beforeUom = tokens.filter((t) => t.index + t.raw.length <= uomMatch.index);
-  const qtyTok = beforeUom[beforeUom.length - 1];
+  let qtyTok = beforeUom[beforeUom.length - 1];
+
+  // This format always prints quantity with 3 decimals ("1.000", "2.000",
+  // "0.400"); OCR sometimes misreads that decimal point as a comma
+  // ("2,000"), which extractNumberTokens then parses as the integer 2000.
+  // Re-read it as a decimal rather than reject it as an implausible qty.
+  if (qtyTok && qtyTok.value > 1000 && /^\d,\d{3}$/.test(qtyTok.raw)) {
+    const reinterpreted = parseFloat(qtyTok.raw.replace(",", "."));
+    if (!Number.isNaN(reinterpreted)) qtyTok = { ...qtyTok, value: reinterpreted };
+  }
+
   if (!qtyTok || qtyTok.value <= 0 || qtyTok.value > 1000) return null;
   if (priceTok === qtyTok || totalTok === qtyTok) return null;
 

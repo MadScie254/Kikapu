@@ -197,6 +197,19 @@ describe("parseReceiptText; Khetia two-line item format with dotted product code
     expect(milk.isUncertain).toBe(false);
   });
 
+  it("reads a quantity whose decimal point OCR'd as a comma ('2,000' misread for '2.000')", () => {
+    const bread = result.items[1];
+    expect(bread.description).toBe("BREAD OVEN FRESH WHITE 1.5KG");
+    expect(bread.quantity).toBe(1);
+    const naturallyCommaQty = parseReceiptText(
+      KHETIA_TWO_LINE_ITEMS.replace("0015.12.00    2.000 PC     80.00      160.00", "0015.12.00    2,000 PC     80.00      160.00"),
+      NOW
+    ).items[2];
+    expect(naturallyCommaQty.quantity).toBe(2);
+    expect(naturallyCommaQty.unitPriceMinor).toBe(8000);
+    expect(naturallyCommaQty.lineTotalMinor).toBe(16000);
+  });
+
   it("reads fractional KG quantities correctly", () => {
     const apple = result.items[4];
     expect(apple.quantity).toBe(0.4);
