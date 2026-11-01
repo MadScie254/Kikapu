@@ -70,12 +70,18 @@ export function extractReceiptNumber(lines: string[]): string | null {
  * single combined pass could miss the real payment method.
  */
 export function extractMpesaCode(lines: string[]): { code: string | null; method: string | null } {
+  let sawMpesa = false;
   for (const line of lines) {
     if (/m[\-\s]?pesa/i.test(line)) {
+      sawMpesa = true;
+      // A receipt often mentions M-Pesa on more than one line (e.g. "MPESA
+      // PAY: 1,147.00" before the real "MPESA Trn #: UK1HL04YT2"); keep
+      // scanning instead of stopping at whichever one has no code.
       const m = line.match(/\b([A-Z0-9]{8,12})\b/);
-      return { code: m ? m[1] : null, method: "M-Pesa" };
+      if (m) return { code: m[1], method: "M-Pesa" };
     }
   }
+  if (sawMpesa) return { code: null, method: "M-Pesa" };
   for (const line of lines) {
     if (/\bvisa\b|\bmastercard\b|\bcard\s*payment\b/i.test(line)) {
       return { code: null, method: "Card" };

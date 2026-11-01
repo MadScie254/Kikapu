@@ -1,6 +1,14 @@
 import { splitLines } from "./textNormalize.js";
 import { parseMerchantName, extractReceiptNumber, extractMpesaCode } from "./merchantParser.js";
-import { parseLineItem, isSummaryLine, isMetadataLine, extractSummaryFields } from "./lineItemParser.js";
+import {
+  parseLineItem,
+  parseTwoLineItem,
+  parseTwoLineItemDetail,
+  isSummaryLine,
+  isMetadataLine,
+  isVatCodeBreakdownRow,
+  extractSummaryFields,
+} from "./lineItemParser.js";
 import { parseReceiptDate, parseReceiptTime } from "../dates.js";
 import { addMoney, subtractMoney } from "../money.js";
 import type { ParsedReceiptResult } from "./types.js";
@@ -47,10 +55,38 @@ export function parseReceiptText(rawText: string, now: Date = new Date()): Parse
   }
 
   const items = [];
-  for (const line of lines) {
-    if (isSummaryLine(line) || isMetadataLine(line)) continue;
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (isSummaryLine(line) || isMetadataLine(line) || isVatCodeBreakdownRow(line)) {
+      i++;
+      continue;
+    }
+
+    // Two-line item format (e.g. Khetia): a description line, then a
+    // "productCode qty UOM unitPrice lineTotal" details line. Some OCR
+    // passes put the trailing VAT-code letter (A/E/G) on its own line
+    // between the two, so check both i+1 and i+2 for the details line.
+    if (i + 1 < lines.length) {
+      const twoLine = parseTwoLineItem(line, lines[i + 1]);
+      if (twoLine) {
+        items.push(twoLine);
+        i += 2;
+        continue;
+      }
+      if (i + 2 < lines.length && /^[A-Z]$/.test(lines[i + 1].trim()) && parseTwoLineItemDetail(lines[i + 2])) {
+        const twoLineSkipLetter = parseTwoLineItem(line, lines[i + 2]);
+        if (twoLineSkipLetter) {
+          items.push(twoLineSkipLetter);
+          i += 3;
+          continue;
+        }
+      }
+    }
+
     const item = parseLineItem(line);
     if (item) items.push(item);
+    i++;
   }
 
   if (items.length === 0) {

@@ -20,6 +20,33 @@ export function isSummaryLine(line: string): boolean {
 const METADATA_LINE_RE =
   /^(tel|phone|p\.?o\.?\s?box|pin\s?(?:no)?\s*[:#]|vat\s?reg|address|location|email|www\.|http|receipt\s?no|invoice\s?no|date\s*[:\/]|time\s*:)/i;
 
+/**
+ * Generic "Label: value" field line (Mobile:, Branch:, Till:, Session:, Rct:,
+ * Amount:, Gross Wt:, Name:, Mobile No.:, MPESA Trn #:, Supervisor:, ...).
+ * Kenyan POS receipts print every header/footer/payment-detail field this
+ * way, and no purchasable item description ever does, so this single rule
+ * catches a whole family of metadata lines (a mobile-number line in
+ * particular, which would otherwise have its digits mistaken for a
+ * quantity/price/total) without having to enumerate every label by hand.
+ * Bounded to a short label so it can't accidentally swallow a long
+ * description line that happens to contain a colon much later.
+ */
+const LABELED_FIELD_LINE_RE = /^[A-Za-z][A-Za-z\s()./#]{0,20}:\s?\S/;
+
+/**
+ * The per-tax-code breakdown row Kenyan receipts print near the bottom, e.g.
+ * "A - 0.00%   507.00   0.00   507.00" or "G - 16.00%   357.76   57.24
+ * 415.00". These restate amounts already counted in the line items above;
+ * without this check they get mistaken for a product line (the surrounding
+ * whitespace between the pre-vat/vat/total numbers looks exactly like a
+ * quantity marker to the generic line parser).
+ */
+const VAT_CODE_BREAKDOWN_ROW_RE = /^[A-Z]\s*-\s*\d+(?:\.\d+)?\s*%/;
+
+export function isVatCodeBreakdownRow(line: string): boolean {
+  return VAT_CODE_BREAKDOWN_ROW_RE.test(line.trim());
+}
+
 // A line that is ENTIRELY a date (optionally with a time), with nothing else
 // on it; e.g. "12/11/2026", "12-O1-2O26 18:42" (after OCR noise-fixing).
 // Receipts often print the transaction date/time on its own line with no
@@ -33,7 +60,13 @@ export function isBareDateLine(line: string): boolean {
 }
 
 export function isMetadataLine(line: string): boolean {
-  return METADATA_LINE_RE.test(line.trim()) || /^[\d\s\-]{10,}$/.test(line.trim()) || isBareDateLine(line);
+  const trimmed = line.trim();
+  return (
+    METADATA_LINE_RE.test(trimmed) ||
+    LABELED_FIELD_LINE_RE.test(trimmed) ||
+    /^[\d\s\-]{10,}$/.test(trimmed) ||
+    isBareDateLine(line)
+  );
 }
 
 const QTY_PREFIX_RE = /^(\d+(?:\.\d+)?)\s*(?:x|X|\*|pcs?|@)\s*$/;
@@ -144,6 +177,88 @@ export function parseLineItem(rawLine: string): ParsedLineItem | null {
     categorySlug: guessCategorySlug(description),
     isUncertain,
     uncertainReason,
+  };
+}
+
+const UOM_RE = /\b(PCS?|KGS?|ML|LTRS?|PKT|PACK|G|L)\b/i;
+
+interface TwoLineItemDetail {
+  qty: number;
+  unitPriceValue: number;
+  lineTotalValue: number;
+}
+
+/**
+ * Some Kenyan supermarket chains (e.g. Khetia) print each item across TWO
+ * lines: a plain description line, then a details line of
+ * "productCode  qty  UOM  unitPrice  lineTotal" (e.g.
+ * "0013.12.02   1.000 PC   113.00   113.00"). The product code is often
+ * itself dotted ("0013.12.02") or just a long barcode ("331837"), which
+ * confuses the generic single-line parser into reading it as part of the
+ * price. This parses that details line on its own, using only the LAST two
+ * numbers on the line (always unit price + total, regardless of how many
+ * stray numbers the leading code splits into) and the number immediately
+ * before the unit-of-measure keyword (always the quantity).
+ */
+export function parseTwoLineItemDetail(rawLine: string): TwoLineItemDetail | null {
+  const line = rawLine.trim();
+  // Must start with a digit (a product/barcode code); distinguishes this
+  // from a VAT-breakdown row ("A - 0.00% ...") or a plain description line,
+  // which start with a letter.
+  if (!/^\d/.test(line)) return null;
+
+  const uomMatch = UOM_RE.exec(line);
+  if (!uomMatch) return null;
+
+  const tokens = extractNumberTokens(line);
+  if (tokens.length < 3) return null;
+
+  const [priceTok, totalTok] = tokens.slice(-2);
+  const beforeUom = tokens.filter((t) => t.index + t.raw.length <= uomMatch.index);
+  const qtyTok = beforeUom[beforeUom.length - 1];
+  if (!qtyTok || qtyTok.value <= 0 || qtyTok.value > 1000) return null;
+  if (priceTok === qtyTok || totalTok === qtyTok) return null;
+
+  return { qty: qtyTok.value, unitPriceValue: priceTok.value, lineTotalValue: totalTok.value };
+}
+
+/** The plain-description line that precedes a two-line item's details line. */
+export function cleanTwoLineDescription(rawLine: string): string | null {
+  let desc = rawLine.trim();
+  if (!desc || desc.length < 2) return null;
+  if (isSummaryLine(desc) || isMetadataLine(desc) || isVatCodeBreakdownRow(desc)) return null;
+  // A lone trailing VAT-code letter (A/E/G/...) is printed right-aligned
+  // next to the description, not part of the product name.
+  desc = desc.replace(/\s+[A-Z]$/, "").trim();
+  if (!desc || desc.length < 2) return null;
+  if (/^[^a-zA-Z]*$/.test(desc)) return null;
+  return desc;
+}
+
+/** Combines a description line with its matching two-line details line into one item. */
+export function parseTwoLineItem(descLine: string, detailLine: string): ParsedLineItem | null {
+  const detail = parseTwoLineItemDetail(detailLine);
+  if (!detail) return null;
+  const description = cleanTwoLineDescription(descLine);
+  if (!description) return null;
+
+  const unitPriceMinor = toMinorUnits(detail.unitPriceValue.toFixed(2));
+  const lineTotalMinor = toMinorUnits(detail.lineTotalValue.toFixed(2));
+  if (unitPriceMinor === 0 && lineTotalMinor === 0) return null;
+
+  const expected = detail.qty * detail.unitPriceValue;
+  const isUncertain = Math.abs(expected - detail.lineTotalValue) > Math.max(0.5, expected * 0.02);
+
+  return {
+    rawLine: `${descLine.trim()} | ${detailLine.trim()}`,
+    description,
+    normalizedName: description,
+    quantity: detail.qty,
+    unitPriceMinor,
+    lineTotalMinor,
+    categorySlug: guessCategorySlug(description),
+    isUncertain,
+    uncertainReason: isUncertain ? "Quantity x unit price doesn't match the line total, please verify." : undefined,
   };
 }
 

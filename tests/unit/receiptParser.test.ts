@@ -7,6 +7,8 @@ import {
   FADED_RECEIPT_NOISY,
   NO_DATE_RECEIPT,
   MISMATCHED_TOTAL_RECEIPT,
+  KHETIA_TWO_LINE_ITEMS,
+  KHETIA_BARCODE_CODES,
 } from "../fixtures/sampleReceipts.js";
 
 const NOW = new Date("2026-11-20T12:00:00Z");
@@ -163,6 +165,97 @@ describe("parseReceiptText; printed total disagrees with the line items", () => 
 
   it("surfaces a warning about the mismatch", () => {
     expect(result.warnings.some((w) => /match/i.test(w))).toBe(true);
+  });
+});
+
+describe("parseReceiptText; Khetia two-line item format with dotted product codes", () => {
+  const result = parseReceiptText(KHETIA_TWO_LINE_ITEMS, NOW);
+
+  it("identifies the merchant chain", () => {
+    expect(result.merchantNameRaw).toBe("Khetia's Supermarket");
+  });
+
+  it("extracts exactly the 8 real products, not the header/MPESA/VAT-breakdown lines", () => {
+    expect(result.items).toHaveLength(8);
+    expect(result.items.map((i) => i.description)).toEqual([
+      "BREAD OVEN FRESH 800G WHITE",
+      "BREAD OVEN FRESH WHITE 1.5KG",
+      "MILK LATO WHOLE 500ML FINO",
+      "FRUIT FRESH KIWI",
+      "FRUIT FRESH GRANNY SMITH APPLE (KG)",
+      "FRUIT FRESH PINK LADY APPLE (KG)",
+      "CUCUMBER ENGLISH FRESH(KAKDI)1KG",
+      "VEGETABLE BHINDA OKRA",
+    ]);
+  });
+
+  it("reads the dotted product code's quantity and price correctly, not as part of the price", () => {
+    const milk = result.items[2];
+    expect(milk.quantity).toBe(2);
+    expect(milk.unitPriceMinor).toBe(8000);
+    expect(milk.lineTotalMinor).toBe(16000);
+    expect(milk.isUncertain).toBe(false);
+  });
+
+  it("reads fractional KG quantities correctly", () => {
+    const apple = result.items[4];
+    expect(apple.quantity).toBe(0.4);
+    expect(apple.unitPriceMinor).toBe(43400);
+    expect(apple.lineTotalMinor).toBe(17360);
+  });
+
+  it("never turns the phone number, branch/till line, or MPESA details into an item", () => {
+    const descriptions = result.items.map((i) => i.description);
+    expect(descriptions.some((d) => /mobile|branch|till|session|rct/i.test(d))).toBe(false);
+    expect(descriptions.some((d) => /amount|trn|mpesa/i.test(d))).toBe(false);
+  });
+
+  it("never turns a VAT-code breakdown row (A - 0.00% ...) into an item", () => {
+    const descriptions = result.items.map((i) => i.description);
+    expect(descriptions.some((d) => /^[AE]\s*-/.test(d))).toBe(false);
+  });
+
+  it("sums to exactly the printed total, with no double-counted or phantom amounts", () => {
+    expect(result.lineItemsSumMinor).toBe(114643);
+    expect(result.printedTotalMinor).toBe(114643);
+    expect(result.totalMatches).toBe(true);
+  });
+
+  it("finds the real M-Pesa code even though an earlier 'MPESA PAY' line has no code on it", () => {
+    expect(result.paymentMethod).toBe("M-Pesa");
+    expect(result.mpesaCode).toBe("UK1HL04YT2");
+  });
+});
+
+describe("parseReceiptText; Khetia two-line item format with plain barcode product codes", () => {
+  const result = parseReceiptText(KHETIA_BARCODE_CODES, NOW);
+
+  it("extracts exactly the 3 real products", () => {
+    expect(result.items).toHaveLength(3);
+    expect(result.items.map((i) => i.description)).toEqual([
+      "BULB ENERGY SAVELITE 4.5W B22 COOL DAY",
+      "BREAD OVEN FRESH 600G WHITE",
+      "DRINK ENERGY MONSTER ENERGY 500ML",
+    ]);
+  });
+
+  it("reads a plain non-decimal barcode's quantity and price correctly", () => {
+    const bulb = result.items[0];
+    expect(bulb.quantity).toBe(2);
+    expect(bulb.unitPriceMinor).toBe(9000);
+    expect(bulb.lineTotalMinor).toBe(18000);
+    expect(bulb.isUncertain).toBe(false);
+  });
+
+  it("sums to exactly the printed total", () => {
+    expect(result.lineItemsSumMinor).toBe(50300);
+    expect(result.printedTotalMinor).toBe(50300);
+    expect(result.totalMatches).toBe(true);
+  });
+
+  it("reads the payment method as Cash with no M-Pesa code", () => {
+    expect(result.paymentMethod).toBe("Cash");
+    expect(result.mpesaCode).toBeNull();
   });
 });
 

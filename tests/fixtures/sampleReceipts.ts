@@ -66,3 +66,84 @@ SUGAR 2KG              230.00
 TEA LEAVES 500G        180.00
 SUBTOTAL               410.00
 TOTAL                  520.00`;
+
+/**
+ * Real Khetia (Gigamart Kitale) receipt format: each item is printed across
+ * TWO lines (description, then "productCode qty UOM unitPrice lineTotal"),
+ * surrounded by a "Label: value" header/footer block and a per-tax-code
+ * breakdown table. Before the two-line parser and the metadata/VAT-row
+ * fixes, this receipt produced phantom items from the Mobile:/Branch:
+ * header line, the MPESA DETAILS block, and the VAT breakdown rows.
+ */
+export const KHETIA_TWO_LINE_ITEMS = `KHETIA GIGAMART
+KITALE, Kenya
+P.O. Box 668, Kitale,
+Mobile: +254 708 888333 /+254 786 838383 gigamart@khetia.com
+CASH SALE
+VAT Reg: 00014695Q Pin No. P000628476L
+Date: 08:24pm Sun 01 November 2026
+Branch: 69 Till: 3 Session: 1159 Rct: 339
+SELINA NALIKA WANGWE
+Item          Qty      Each      Total
+BREAD OVEN FRESH 800G WHITE                A
+0013.12.02    1.000 PC    113.00      113.00
+BREAD OVEN FRESH WHITE 1.5KG                A
+0013.12.02    1.000 PC    234.00      234.00
+MILK LATO WHOLE 500ML FINO                  A
+0015.12.00    2.000 PC     80.00      160.00
+FRUIT FRESH KIWI                            E
+0023.11.00    2.000 PC    144.00      288.00
+FRUIT FRESH GRANNY SMITH APPLE (KG)         E
+0024.11.00    0.400 KG    434.00      173.60
+FRUIT FRESH PINK LADY APPLE (KG)            E
+0024.11.00    0.105 KG    455.00       47.78
+CUCUMBER ENGLISH FRESH(KAKDI)1KG            E
+0023.11.00    0.225 KG    188.00       42.30
+VEGETABLE BHINDA OKRA                       E
+0023.11.00    0.375 KG    234.00       87.75
+TOTAL                                    1,146.43
+CASH PAID                                    0.00
+MPESA PAY                                1,147.00
+CHANGE                                       0.57
+Total Qty : 7.11 units
+Gross Wt : 1.45 kgs (approx.)
+Cashier : WAKOLI
+Supervisor: Ramsley
+MPESA DETAILS
+Name : Daniel
+Mobile No. : 2f84f5c4a805e56ee4c18d589
+MPESA Trn # : UK1HL04YT2
+Amount : 1,147.00
+CODE   PRE-VAT    VAT    TOTAL
+A - 0.00%     507.00    0.00    507.00
+E - 0.00%     639.43    0.00    639.43
+TOTALS      1,146.43    0.00  1,146.43`;
+
+/** Same Khetia chain/format, mixed PC-counted and non-decimal barcode product codes, cash payment. */
+export const KHETIA_BARCODE_CODES = `KHETIA DRAPERS LTD.
+KHETIA'S WEBUYE
+P.O. Box 668, Kitale, Kenya
+Mobile: +254 708 888333 /+254 786 838383 gigamart@khetia.com
+CASH SALE
+VAT Reg: 00014695Q Pin No. P000628476L
+Date: 07:19pm Sun 01 November 2026
+Branch: 69 Till: 2 Session: 855 Rct: 357
+SELINA NALIKA WANGWE
+Item          Qty      Each      Total
+BULB ENERGY SAVELITE 4.5W B22 COOL DAY      G
+331837        2.000 PC     90.00      180.00
+BREAD OVEN FRESH 600G WHITE                 A
+0013.12.02    1.000 PC     88.00       88.00
+DRINK ENERGY MONSTER ENERGY 500ML           G
+433881        1.000 PC    235.00      235.00
+TOTAL                                      503.00
+CASH PAID                                  600.00
+CHANGE                                      97.00
+Total Qty : 4.00 units
+Gross Wt : 0.20 kgs (approx.)
+Cashier : FAITH.NM
+Supervisor: Josiah
+CODE   PRE-VAT    VAT    TOTAL
+A - 0.00%      88.00    0.00     88.00
+G - 16.00%    357.76   57.24    415.00
+TOTALS       445.76    57.24    503.00`;
