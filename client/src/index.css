@@ -20,7 +20,7 @@
     --secondary-foreground: 221 51% 16%;
 
     --accent: 160 84% 39%;
-    --accent-foreground: 0 0% 100%;
+    --accent-foreground: 221 51% 16%;
 
     --muted: 215 25% 95%;
     --muted-foreground: 215 16% 42%;
@@ -29,7 +29,7 @@
     --destructive-foreground: 0 0% 100%;
 
     --success: 160 84% 39%;
-    --success-foreground: 0 0% 100%;
+    --success-foreground: 221 51% 16%;
 
     --warning: 38 92% 50%;
     --warning-foreground: 221 51% 16%;
