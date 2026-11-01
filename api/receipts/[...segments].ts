@@ -34,7 +34,9 @@ const listQuerySchema = z.object({
 export default withApi(async (req: VercelRequest, res: VercelResponse) => {
   const ctx = await requireAuth(req);
   const db = getDb();
-  const segments = ([] as string[]).concat((req.query.segments as string | string[] | undefined) ?? []);
+  // Vercel's plain Node builder keeps the literal "..." in a catch-all's
+  // query key, so the populated key is "...segments", not "segments".
+  const segments = ([] as string[]).concat((req.query["...segments"] as string | string[] | undefined) ?? []);
 
   // /api/receipts
   if (segments.length === 0) {
