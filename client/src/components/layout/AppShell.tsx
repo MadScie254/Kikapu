@@ -5,6 +5,7 @@ import { MobileBottomNav } from "./MobileBottomNav";
 import { OfflineSyncProvider } from "./OfflineSyncProvider";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   DropdownMenu,
@@ -38,7 +39,10 @@ export function AppShell() {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>{user?.displayName}</DropdownMenuLabel>
+                  <DropdownMenuLabel className="flex items-center gap-2">
+                  {user?.displayName}
+                  {user?.role === "admin" && <Badge variant="accent">Super User</Badge>}
+                </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate("/app/settings")}>
                     <SettingsIcon className="size-4" /> Settings

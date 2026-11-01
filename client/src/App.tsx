@@ -25,6 +25,7 @@ const ShoppingLists = lazy(() => import("@/pages/app/ShoppingLists"));
 const ShoppingListDetail = lazy(() => import("@/pages/app/ShoppingListDetail"));
 const Stores = lazy(() => import("@/pages/app/Stores"));
 const Settings = lazy(() => import("@/pages/app/Settings"));
+const Admin = lazy(() => import("@/pages/app/Admin"));
 
 export default function App() {
   return (
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="shopping-lists/:id" element={<ShoppingListDetail />} />
           <Route path="stores" element={<Stores />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="admin" element={<Admin />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

@@ -8,6 +8,13 @@
       "when": 1793549273501,
       "tag": "0000_strange_mister_fear",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793561381041,
+      "tag": "0001_fast_dark_beast",
+      "breakpoints": true
     }
   ]
 }

@@ -78,6 +78,26 @@ export async function requireAuth(req: VercelRequest): Promise<AuthContext> {
   return ctx;
 }
 
+/** Admin-only routes (the cross-household dashboard). Returns 404, not 403, so the existence of admin routes isn't disclosed to non-admins. */
+export async function requireAdmin(req: VercelRequest): Promise<AuthContext> {
+  const ctx = await requireAuth(req);
+  if (ctx.role !== "admin") throw new HttpError(404, "Not found.");
+  return ctx;
+}
+
+/**
+ * Gates one-time setup actions (applying a schema migration, promoting the
+ * first admin) that must run before any user — let alone an admin — exists.
+ * Protected by a secret the operator sets as the ADMIN_SETUP_SECRET env var,
+ * never by a role check.
+ */
+export function requireSetupSecret(req: VercelRequest) {
+  const expected = process.env.ADMIN_SETUP_SECRET;
+  if (!expected) throw new HttpError(404, "Not found.");
+  const provided = req.headers["x-setup-secret"];
+  if (provided !== expected) throw new HttpError(404, "Not found.");
+}
+
 export function parseBody<T>(schema: ZodType<T, any, any>, req: VercelRequest): T {
   const result = schema.safeParse(req.body);
   if (!result.success) {

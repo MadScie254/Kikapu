@@ -33,6 +33,7 @@ export async function getPublicUserPayload(db: Database, userId: string): Promis
     id: user.id,
     email: user.email,
     displayName: user.displayName,
+    role: user.role === "admin" ? "admin" : "user",
     currency: household?.currency ?? "KES",
     monthlyBudgetMinor: household?.monthlyBudgetMinor ?? null,
     onboardingCompletedAt: household?.onboardingCompletedAt?.toISOString() ?? null,

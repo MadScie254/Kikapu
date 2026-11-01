@@ -2,10 +2,13 @@
 
 export type UUID = string;
 
+export type UserRole = "user" | "admin";
+
 export interface PublicUser {
   id: UUID;
   email: string;
   displayName: string;
+  role: UserRole;
   currency: string;
   monthlyBudgetMinor: number | null;
   onboardingCompletedAt: string | null;

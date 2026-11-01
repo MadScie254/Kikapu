@@ -28,7 +28,7 @@ export default withApi(async (req: VercelRequest, res: VercelResponse) => {
     return;
   }
 
-  await enforceRateLimit(`upload:${ctx.userId}`, 40, 60 * 60);
+  if (ctx.role !== "admin") await enforceRateLimit(`upload:${ctx.userId}`, 40, 60 * 60);
 
   const { imageBase64, contentType } = parseBody(bodySchema, req);
   const base64Data = imageBase64.includes(",") ? imageBase64.split(",")[1] : imageBase64;

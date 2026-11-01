@@ -70,6 +70,7 @@ export interface AuthContext {
   userId: string;
   sessionId: string;
   householdId: string;
+  role: "user" | "admin";
 }
 
 /**
@@ -106,7 +107,18 @@ export async function getAuthContext(req: VercelRequest): Promise<AuthContext | 
 
   if (!membership) return null;
 
-  return { userId: payload.uid, sessionId: session.id, householdId: membership.householdId };
+  const [user] = await db
+    .select({ role: schema.users.role })
+    .from(schema.users)
+    .where(eq(schema.users.id, payload.uid))
+    .limit(1);
+
+  return {
+    userId: payload.uid,
+    sessionId: session.id,
+    householdId: membership.householdId,
+    role: user?.role === "admin" ? "admin" : "user",
+  };
 }
 
 export function setSessionCookie(res: VercelResponse, token: string) {

@@ -52,7 +52,7 @@ export default withApi(async (req: VercelRequest, res: VercelResponse) => {
   }
 
   const { imageBase64, contentType } = parseBody(bodySchema, req);
-  await enforceRateLimit(`ai:${ctx.userId}`, 15, 24 * 60 * 60);
+  if (ctx.role !== "admin") await enforceRateLimit(`ai:${ctx.userId}`, 15, 24 * 60 * 60);
 
   const base64Data = imageBase64.includes(",") ? imageBase64.split(",")[1] : imageBase64;
 
