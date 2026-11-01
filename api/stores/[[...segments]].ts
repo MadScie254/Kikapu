@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
 import { getDb } from "../../lib/db/client.js";
-import { withApi, requireAuth, requireMethod, parseQuery, sendJson, HttpError } from "../../lib/http.js";
+import { withApi, requireAuth, requireMethod, parseQuery, sendJson, HttpError, getCatchAllSegments } from "../../lib/http.js";
 import { listStores, getProductPriceHistory } from "../../lib/db/queries/storeQueries.js";
 
 /**
@@ -13,9 +13,7 @@ export default withApi(async (req: VercelRequest, res: VercelResponse) => {
   requireMethod(req, "GET");
   const ctx = await requireAuth(req);
   const db = getDb();
-  // Vercel's plain Node builder keeps the literal "..." in a catch-all's
-  // query key, so the populated key is "...segments", not "segments".
-  const segments = ([] as string[]).concat((req.query["...segments"] as string | string[] | undefined) ?? []);
+  const segments = getCatchAllSegments(req);
 
   if (segments.length === 0) {
     const stores = await listStores(db, ctx.householdId);

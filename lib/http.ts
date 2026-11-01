@@ -16,6 +16,26 @@ export function sendJson(res: VercelResponse, status: number, body: unknown) {
   res.status(status).setHeader("Content-Type", "application/json").send(JSON.stringify(body));
 }
 
+/**
+ * Reads the path segments captured by an optional catch-all route file,
+ * e.g. api/receipts/[[...segments]].ts for /api/receipts/:a/:b.
+ *
+ * Vercel's plain Node builder (this project has no framework) does not
+ * reliably use the plain "segments" key: an earlier version of these routes
+ * found it under the literal "...segments" key instead (keeping the dots
+ * from the bracket syntax). Rather than hardcode one exact key name and
+ * risk silently reading `undefined` again the next time this changes, scan
+ * for whichever query key actually contains "segments".
+ */
+export function getCatchAllSegments(req: VercelRequest): string[] {
+  for (const [key, value] of Object.entries(req.query)) {
+    if (key.toLowerCase().includes("segments")) {
+      return ([] as string[]).concat((value as string | string[] | undefined) ?? []);
+    }
+  }
+  return [];
+}
+
 function applyCors(req: VercelRequest, res: VercelResponse) {
   const allowed = process.env.CORS_ORIGIN;
   const origin = req.headers.origin;

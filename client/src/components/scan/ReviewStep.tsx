@@ -118,11 +118,11 @@ export function ReviewStep({ parsed, source, rawOcrText, uploadedImagePath, onDo
     setItems((prev) => [...prev, newItem()]);
   }
 
-  function buildPayload(acknowledgeDuplicate: boolean) {
+  function buildPayload(acknowledgeDuplicate: boolean, purchasedAtIso: string) {
     const categoryBySlug = new Map(categories.map((c) => [c.slug, c.id] as const));
     return {
       merchantNameRaw: merchantName.trim() || "Unknown Merchant",
-      purchasedAt: new Date(purchasedAt).toISOString(),
+      purchasedAt: purchasedAtIso,
       receiptNumber: receiptNumber.trim() || null,
       subtotalMinor,
       discountMinor,
@@ -138,13 +138,18 @@ export function ReviewStep({ parsed, source, rawOcrText, uploadedImagePath, onDo
       shoppingListId: null,
       acknowledgeDuplicate,
       items: items
-        .filter((i) => i.rawDescription.trim())
-        .map((i, idx) => ({
+        // Pair each item with its line total BEFORE filtering, so a deleted/
+        // blank item in the middle can't shift every later item's total onto
+        // the wrong line (lineTotals[idx] after .filter() used the filtered
+        // array's index, not the original one).
+        .map((i, originalIdx) => ({ item: i, lineTotalMinor: lineTotals[originalIdx] }))
+        .filter(({ item }) => item.rawDescription.trim())
+        .map(({ item: i, lineTotalMinor }) => ({
           rawDescription: i.rawDescription.trim(),
           normalizedName: i.rawDescription.trim(),
           quantity: parseFloat(i.quantity) || 1,
           unitPriceMinor: toMinorUnits(i.unitPriceMinor || "0"),
-          lineTotalMinor: lineTotals[idx],
+          lineTotalMinor,
           categoryId: categoryBySlug.get(i.categorySlug) ?? categoryBySlug.get("other") ?? null,
           isUncertain: i.isUncertain,
         })),
@@ -160,9 +165,14 @@ export function ReviewStep({ parsed, source, rawOcrText, uploadedImagePath, onDo
       toast({ title: "Add at least one item", variant: "destructive" });
       return;
     }
+    const purchasedAtDate = new Date(purchasedAt);
+    if (Number.isNaN(purchasedAtDate.getTime())) {
+      toast({ title: "Set a valid date", description: "The date field is empty or invalid.", variant: "destructive" });
+      return;
+    }
 
     setSubmitting(true);
-    const payload = buildPayload(acknowledgeDuplicate);
+    const payload = buildPayload(acknowledgeDuplicate, purchasedAtDate.toISOString());
     try {
       const result = await api.post<{ receipt?: Receipt; possibleDuplicate?: typeof duplicateInfo }>("/receipts", payload);
       if (result.possibleDuplicate) {
@@ -174,6 +184,7 @@ export function ReviewStep({ parsed, source, rawOcrText, uploadedImagePath, onDo
       onDone();
       navigate("/app/receipts");
     } catch (err) {
+      console.error("Couldn't save receipt:", err);
       if (err instanceof TypeError || !navigator.onLine) {
         await saveOfflineDraft(payload as any);
         toast({
@@ -186,7 +197,7 @@ export function ReviewStep({ parsed, source, rawOcrText, uploadedImagePath, onDo
       }
       toast({
         title: "Couldn't save receipt",
-        description: err instanceof ApiClientError ? err.message : "Please try again.",
+        description: err instanceof ApiClientError ? err.message : "Something unexpected went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
