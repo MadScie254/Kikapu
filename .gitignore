@@ -1,0 +1,15 @@
+node_modules
+dist
+.vercel
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+coverage
+playwright-report
+test-results
+.turbo
+client/dist
+client/.vite
+tsconfig.tsbuildinfo
