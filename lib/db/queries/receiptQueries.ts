@@ -107,47 +107,53 @@ export async function createReceipt(db: Database, householdId: string, userId: s
 
   const imageUrl = input.imageBlobPath ? await resolveBlobUrl(input.imageBlobPath) : null;
 
-  await db.transaction(async (tx) => {
-    await tx.insert(schema.receipts).values({
-      id: receiptId,
-      householdId,
-      merchantId: merchant?.id ?? null,
-      merchantNameRaw: input.merchantNameRaw,
-      purchasedAt: new Date(input.purchasedAt),
-      receiptNumber: input.receiptNumber ?? null,
-      subtotalMinor,
-      discountMinor: input.discountMinor,
-      taxMinor: input.taxMinor,
-      otherChargesMinor: input.otherChargesMinor,
-      totalMinor: input.totalMinor,
-      printedTotalMinor: input.printedTotalMinor ?? null,
-      totalDiscrepancyMinor,
-      paymentMethod: input.paymentMethod ?? null,
-      source: input.source,
-      notes: input.notes ?? null,
-      rawOcrText: input.rawOcrText ?? null,
-      imageUrl,
-      imageBlobPath: input.imageBlobPath ?? null,
-      shoppingListId: input.shoppingListId ?? null,
-      duplicateAcknowledged: input.acknowledgeDuplicate ?? false,
-      createdByUserId: userId,
-    });
-
-    await tx.insert(schema.receiptItems).values(
-      itemsWithProducts.map((item, idx) => ({
-        receiptId,
-        productId: item.productId,
-        rawDescription: item.rawDescription,
-        normalizedName: item.normalizedName ?? item.rawDescription,
-        quantity: String(item.quantity),
-        unitPriceMinor: item.unitPriceMinor,
-        lineTotalMinor: item.lineTotalMinor,
-        categoryId: item.categoryId ?? null,
-        isUncertain: item.isUncertain ?? false,
-        sortOrder: idx,
-      }))
-    );
+  // drizzle-orm/neon-http (Neon's stateless HTTP driver, used here so every
+  // serverless invocation can run a query with no connection setup cost)
+  // does NOT support SQL transactions at all — db.transaction() throws
+  // immediately ("No transactions support in neon-http driver"). These two
+  // inserts run sequentially instead; a receipt without its items (if the
+  // second insert fails right after the first succeeds) is the accepted
+  // tradeoff of this driver, not a risk this app can fully eliminate
+  // without switching to Neon's pooled/websocket driver.
+  await db.insert(schema.receipts).values({
+    id: receiptId,
+    householdId,
+    merchantId: merchant?.id ?? null,
+    merchantNameRaw: input.merchantNameRaw,
+    purchasedAt: new Date(input.purchasedAt),
+    receiptNumber: input.receiptNumber ?? null,
+    subtotalMinor,
+    discountMinor: input.discountMinor,
+    taxMinor: input.taxMinor,
+    otherChargesMinor: input.otherChargesMinor,
+    totalMinor: input.totalMinor,
+    printedTotalMinor: input.printedTotalMinor ?? null,
+    totalDiscrepancyMinor,
+    paymentMethod: input.paymentMethod ?? null,
+    source: input.source,
+    notes: input.notes ?? null,
+    rawOcrText: input.rawOcrText ?? null,
+    imageUrl,
+    imageBlobPath: input.imageBlobPath ?? null,
+    shoppingListId: input.shoppingListId ?? null,
+    duplicateAcknowledged: input.acknowledgeDuplicate ?? false,
+    createdByUserId: userId,
   });
+
+  await db.insert(schema.receiptItems).values(
+    itemsWithProducts.map((item, idx) => ({
+      receiptId,
+      productId: item.productId,
+      rawDescription: item.rawDescription,
+      normalizedName: item.normalizedName ?? item.rawDescription,
+      quantity: String(item.quantity),
+      unitPriceMinor: item.unitPriceMinor,
+      lineTotalMinor: item.lineTotalMinor,
+      categoryId: item.categoryId ?? null,
+      isUncertain: item.isUncertain ?? false,
+      sortOrder: idx,
+    }))
+  );
 
   return getReceiptById(db, householdId, receiptId);
 }
@@ -248,39 +254,39 @@ export async function updateReceipt(db: Database, householdId: string, id: strin
   const existing = await getReceiptById(db, householdId, id);
   if (!existing) return null;
 
-  await db.transaction(async (tx) => {
-    const updates: Record<string, unknown> = { updatedAt: new Date() };
-    if (input.merchantNameRaw !== undefined) updates.merchantNameRaw = input.merchantNameRaw;
-    if (input.purchasedAt !== undefined) updates.purchasedAt = new Date(input.purchasedAt);
-    if (input.receiptNumber !== undefined) updates.receiptNumber = input.receiptNumber;
-    if (input.subtotalMinor !== undefined) updates.subtotalMinor = input.subtotalMinor;
-    if (input.discountMinor !== undefined) updates.discountMinor = input.discountMinor;
-    if (input.taxMinor !== undefined) updates.taxMinor = input.taxMinor;
-    if (input.otherChargesMinor !== undefined) updates.otherChargesMinor = input.otherChargesMinor;
-    if (input.totalMinor !== undefined) updates.totalMinor = input.totalMinor;
-    if (input.printedTotalMinor !== undefined) updates.printedTotalMinor = input.printedTotalMinor;
-    if (input.paymentMethod !== undefined) updates.paymentMethod = input.paymentMethod;
-    if (input.notes !== undefined) updates.notes = input.notes;
+  // See the comment in createReceipt: neon-http has no transaction support,
+  // so these run sequentially rather than atomically.
+  const updates: Record<string, unknown> = { updatedAt: new Date() };
+  if (input.merchantNameRaw !== undefined) updates.merchantNameRaw = input.merchantNameRaw;
+  if (input.purchasedAt !== undefined) updates.purchasedAt = new Date(input.purchasedAt);
+  if (input.receiptNumber !== undefined) updates.receiptNumber = input.receiptNumber;
+  if (input.subtotalMinor !== undefined) updates.subtotalMinor = input.subtotalMinor;
+  if (input.discountMinor !== undefined) updates.discountMinor = input.discountMinor;
+  if (input.taxMinor !== undefined) updates.taxMinor = input.taxMinor;
+  if (input.otherChargesMinor !== undefined) updates.otherChargesMinor = input.otherChargesMinor;
+  if (input.totalMinor !== undefined) updates.totalMinor = input.totalMinor;
+  if (input.printedTotalMinor !== undefined) updates.printedTotalMinor = input.printedTotalMinor;
+  if (input.paymentMethod !== undefined) updates.paymentMethod = input.paymentMethod;
+  if (input.notes !== undefined) updates.notes = input.notes;
 
-    await tx.update(schema.receipts).set(updates).where(eq(schema.receipts.id, id));
+  await db.update(schema.receipts).set(updates).where(eq(schema.receipts.id, id));
 
-    if (input.items) {
-      await tx.delete(schema.receiptItems).where(eq(schema.receiptItems.receiptId, id));
-      await tx.insert(schema.receiptItems).values(
-        input.items.map((item, idx) => ({
-          receiptId: id,
-          rawDescription: item.rawDescription,
-          normalizedName: item.normalizedName ?? item.rawDescription,
-          quantity: String(item.quantity),
-          unitPriceMinor: item.unitPriceMinor,
-          lineTotalMinor: item.lineTotalMinor,
-          categoryId: item.categoryId ?? null,
-          isUncertain: item.isUncertain ?? false,
-          sortOrder: idx,
-        }))
-      );
-    }
-  });
+  if (input.items) {
+    await db.delete(schema.receiptItems).where(eq(schema.receiptItems.receiptId, id));
+    await db.insert(schema.receiptItems).values(
+      input.items.map((item, idx) => ({
+        receiptId: id,
+        rawDescription: item.rawDescription,
+        normalizedName: item.normalizedName ?? item.rawDescription,
+        quantity: String(item.quantity),
+        unitPriceMinor: item.unitPriceMinor,
+        lineTotalMinor: item.lineTotalMinor,
+        categoryId: item.categoryId ?? null,
+        isUncertain: item.isUncertain ?? false,
+        sortOrder: idx,
+      }))
+    );
+  }
 
   return getReceiptById(db, householdId, id);
 }
