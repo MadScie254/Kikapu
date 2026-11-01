@@ -234,6 +234,17 @@ describe("parseReceiptText; Khetia two-line item format with dotted product code
     expect(result.totalMatches).toBe(true);
   });
 
+  it("strips a product code an AI transcription glued onto the description line", () => {
+    const withGluedCode = KHETIA_TWO_LINE_ITEMS.replace(
+      "BREAD OVEN FRESH 800G WHITE                A\n0013.12.02    1.000 PC    113.00      113.00",
+      "BREAD OVEN FRESH 800G WHITE 0013.12.02\n1.000 PC    113.00      113.00"
+    );
+    const bread = parseReceiptText(withGluedCode, NOW).items[0];
+    expect(bread.description).toBe("BREAD OVEN FRESH 800G WHITE");
+    expect(bread.unitPriceMinor).toBe(11300);
+    expect(bread.lineTotalMinor).toBe(11300);
+  });
+
   it("finds the real M-Pesa code even though an earlier 'MPESA PAY' line has no code on it", () => {
     expect(result.paymentMethod).toBe("M-Pesa");
     expect(result.mpesaCode).toBe("UK1HL04YT2");

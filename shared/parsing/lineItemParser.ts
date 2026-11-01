@@ -151,6 +151,10 @@ export function parseLineItem(rawLine: string): ParsedLineItem | null {
 
   let description = line.slice(0, descEndIndex).trim();
   description = description.replace(/^[\d]{8,}\s*/, ""); // strip leading barcode
+  // Strip a trailing dotted product/department code ("0013.12.02"); printed on
+  // its own line on some receipts, but an AI transcription sometimes glues it
+  // onto the description instead of the quantity/price line that follows it.
+  description = description.replace(/\s+\d{3,5}(?:\.\d{1,2}){1,3}$/, "");
   description = description.replace(/[\s\-:*.]+$/, "").trim();
 
   if (!description || description.length < 2) return null;
@@ -240,6 +244,10 @@ export function cleanTwoLineDescription(rawLine: string): string | null {
   // A lone trailing VAT-code letter (A/E/G/...) is printed right-aligned
   // next to the description, not part of the product name.
   desc = desc.replace(/\s+[A-Z]$/, "").trim();
+  // A trailing dotted product/department code ("0013.12.02"); printed on its
+  // own line on the receipt, but an AI transcription sometimes glues it onto
+  // the description instead of the quantity/price line that follows it.
+  desc = desc.replace(/\s+\d{3,5}(?:\.\d{1,2}){1,3}$/, "").trim();
   if (!desc || desc.length < 2) return null;
   if (/^[^a-zA-Z]*$/.test(desc)) return null;
   return desc;
